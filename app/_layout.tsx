@@ -1,24 +1,77 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { useEffect } from "react";
+import { Appearance, Platform } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import * as SplashScreen from "expo-splash-screen";
+import { Stack } from "expo-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ClerkProvider } from "@clerk/clerk-expo";
+import { tokenCache } from "@clerk/clerk-expo/token-cache";
+import { useFonts } from "@expo-google-fonts/urbanist/useFonts";
+import {
+  Urbanist_400Regular,
+  Urbanist_500Medium,
+  Urbanist_600SemiBold,
+} from "@expo-google-fonts/urbanist";
+import "../lib/theme/global.css";
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+SplashScreen.preventAutoHideAsync();
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+export { ErrorBoundary } from "../components/ErrorBoundary";
 
+const queryClient = new QueryClient();
+
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+if (!publishableKey) {
+  throw new Error(
+    "Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY. Add it to your .env file."
+  );
+}
+
+/**
+ * Root layout - wraps auth and drawer groups.
+ * Default route is / (drawer home). Auth at /sign-in, /sign-up.
+ * App defaults to dark mode with Urbanist font.
+ */
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const [fontsLoaded] = useFonts({
+    Urbanist_400Regular,
+    Urbanist_500Medium,
+    Urbanist_600SemiBold,
+  });
+
+  useEffect(() => {
+    Appearance.setColorScheme("dark");
+  }, []);
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+    <QueryClientProvider client={queryClient}>
+      <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+        <StatusBar
+          style="light"
+          translucent={Platform.OS === "android"}
+          backgroundColor={Platform.OS === "android" ? "transparent" : undefined}
+        />
+        <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
       </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+      </ClerkProvider>
+    </QueryClientProvider>
   );
 }

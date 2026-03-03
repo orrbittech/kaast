@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "apk",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
@@ -33,12 +33,21 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#171717",
           "dark": {
-            "backgroundColor": "#000000"
+            "backgroundColor": "#171717"
           }
         }
-      ]
+      ],
+      "expo-font",
+      "expo-secure-store",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Use Face ID to sign in quickly"
+        }
+      ],
+      "expo-apple-authentication"
     ],
     "experiments": {
       "typedRoutes": true,
