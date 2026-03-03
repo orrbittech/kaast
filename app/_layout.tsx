@@ -1,30 +1,30 @@
-import { useEffect } from "react";
-import { Appearance, Platform } from "react-native";
-import { StatusBar } from "expo-status-bar";
-import * as SplashScreen from "expo-splash-screen";
-import { Stack } from "expo-router";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ClerkProvider } from "@clerk/clerk-expo";
-import { tokenCache } from "@clerk/clerk-expo/token-cache";
-import { useFonts } from "@expo-google-fonts/urbanist/useFonts";
+import { useEffect } from 'react';
+import { Appearance, Platform } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import * as SplashScreen from 'expo-splash-screen';
+import { Stack } from 'expo-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ClerkProvider } from '@clerk/clerk-expo';
+import { tokenCache } from '@clerk/clerk-expo/token-cache';
+import { useFonts } from '@expo-google-fonts/urbanist/useFonts';
 import {
-  Urbanist_400Regular,
-  Urbanist_500Medium,
-  Urbanist_600SemiBold,
-} from "@expo-google-fonts/urbanist";
-import "../lib/theme/global.css";
+    Urbanist_400Regular,
+    Urbanist_500Medium,
+    Urbanist_600SemiBold,
+} from '@expo-google-fonts/urbanist';
+import '../lib/theme/global.css';
 
 SplashScreen.preventAutoHideAsync();
 
-export { ErrorBoundary } from "../components/ErrorBoundary";
+export { ErrorBoundary } from '../components/ErrorBoundary';
 
 const queryClient = new QueryClient();
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 if (!publishableKey) {
-  throw new Error(
-    "Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY. Add it to your .env file."
-  );
+    throw new Error(
+        'Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY. Add it to your .env file.',
+    );
 }
 
 /**
@@ -33,45 +33,62 @@ if (!publishableKey) {
  * App defaults to dark mode with Urbanist font.
  */
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    Urbanist_400Regular,
-    Urbanist_500Medium,
-    Urbanist_600SemiBold,
-  });
+    const [fontsLoaded] = useFonts({
+        Urbanist_400Regular,
+        Urbanist_500Medium,
+        Urbanist_600SemiBold,
+    });
 
-  useEffect(() => {
-    Appearance.setColorScheme("dark");
-  }, []);
+    useEffect(() => {
+        Appearance.setColorScheme('dark');
+    }, []);
 
-  useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
+    useEffect(() => {
+        if (fontsLoaded) {
+            SplashScreen.hideAsync();
+        }
+    }, [fontsLoaded]);
+
+    if (!fontsLoaded) {
+        return null;
     }
-  }, [fontsLoaded]);
 
-  if (!fontsLoaded) {
-    return null;
-  }
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-        <StatusBar
-          style="light"
-          translucent={Platform.OS === "android"}
-          backgroundColor={Platform.OS === "android" ? "transparent" : undefined}
-        />
-        <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-      </Stack>
-      </ClerkProvider>
-    </QueryClientProvider>
-  );
+    return (
+        <QueryClientProvider client={queryClient}>
+            <ClerkProvider
+                publishableKey={publishableKey}
+                tokenCache={tokenCache}
+            >
+                <StatusBar
+                    style="light"
+                    translucent={Platform.OS === 'android'}
+                    backgroundColor={
+                        Platform.OS === 'android' ? 'transparent' : undefined
+                    }
+                />
+                <Stack
+                    screenOptions={{
+                        headerShown: false,
+                    }}
+                >
+                    <Stack.Screen
+                        name="index"
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="(onboarding)"
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="(auth)"
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="(drawer)"
+                        options={{ headerShown: false }}
+                    />
+                </Stack>
+            </ClerkProvider>
+        </QueryClientProvider>
+    );
 }

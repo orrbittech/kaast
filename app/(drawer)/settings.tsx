@@ -1,60 +1,128 @@
-import { View, Pressable } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { useClerk } from "@clerk/clerk-expo";
-import { Text } from "../../components/ui/Text";
-import { DRAWER_HEADER_HEIGHT } from "../../lib/constants";
+import { View, Pressable, Alert } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
+import { Ionicons } from '@expo/vector-icons';
+import { useClerk } from '@clerk/clerk-expo';
+import { Text } from '../../components/ui/Text';
+import { DRAWER_HEADER_HEIGHT } from '../../lib/constants';
+
+const accountPortalUrl = process.env.EXPO_PUBLIC_CLERK_ACCOUNT_PORTAL_URL;
 
 /**
- * Settings screen - app preferences and sign out.
+ * Settings screen - app preferences, Clerk account/security, and sign out.
+ * Account and Security open Clerk's hosted Account Portal in browser.
  */
 export default function SettingsScreen() {
-  const insets = useSafeAreaInsets();
-  const router = useRouter();
-  const { signOut } = useClerk();
-  const contentTopPadding = insets.top + DRAWER_HEADER_HEIGHT + 24;
+    const insets = useSafeAreaInsets();
+    const router = useRouter();
+    const { signOut } = useClerk();
+    const contentTopPadding = insets.top + DRAWER_HEADER_HEIGHT + 24;
 
-  const onSignOut = async () => {
-    await signOut?.();
-    router.replace("/sign-in");
-  };
+    const openAccountPortal = async () => {
+        if (accountPortalUrl) {
+            await WebBrowser.openBrowserAsync(accountPortalUrl);
+        } else {
+            Alert.alert(
+                'Not configured',
+                'Account Portal URL is not set. Add EXPO_PUBLIC_CLERK_ACCOUNT_PORTAL_URL to your .env and enable Account Portal in the Clerk Dashboard.',
+                [{ text: 'OK' }]
+            );
+        }
+    };
 
-  return (
-    <View
-      className="flex-1 bg-base px-6"
-      style={{ paddingTop: contentTopPadding }}
-    >
-      <View className="flex-1 justify-center max-w-md">
-        <Text className="text-2xl font-sans-semibold text-white mb-2">Settings</Text>
-        <Text className="text-zinc-400 mb-6">
-          Manage your account and preferences
-        </Text>
+    const onSignOut = async () => {
+        await signOut?.();
+        router.replace('/sign-in');
+    };
 
-        <View className="gap-4">
-        <Pressable className="p-4 rounded-xl bg-zinc-800 active:opacity-80">
-          <Text className="font-sans-medium text-white">Account</Text>
-          <Text className="text-sm text-zinc-400 mt-1">
-            Profile and organization
-          </Text>
-        </Pressable>
-
-        <Pressable className="p-4 rounded-xl bg-zinc-800 active:opacity-80">
-          <Text className="font-sans-medium text-white">Notifications</Text>
-          <Text className="text-sm text-zinc-400 mt-1">
-            Push and device alerts
-          </Text>
-        </Pressable>
-
-        <Pressable
-          onPress={onSignOut}
-          className="mt-6 p-4 rounded-xl bg-cancel active:opacity-90"
+    return (
+        <View
+            className="flex-1 bg-base px-6"
+            style={{ paddingTop: contentTopPadding }}
         >
-          <Text className="font-sans-medium text-white text-center">
-            Sign Out
-          </Text>
-        </Pressable>
+            <View className="max-w-md">
+                <Text className="text-2xl font-sans-semibold text-white mb-2">
+                    Settings
+                </Text>
+                <Text className="text-zinc-400 mb-6">
+                    Manage your account and preferences
+                </Text>
+
+                <View className="gap-4">
+                    <Pressable
+                        onPress={openAccountPortal}
+                        className="p-4 rounded-xl bg-zinc-800 active:opacity-80"
+                    >
+                        <View className="flex-row justify-between items-center">
+                            <Text className="font-sans-medium text-white">
+                                Account
+                            </Text>
+                            <Ionicons
+                                name="chevron-forward"
+                                size={20}
+                                color="#a1a1aa"
+                            />
+                        </View>
+                        <Text className="text-sm text-zinc-400 mt-1">
+                            Profile and organization
+                        </Text>
+                    </Pressable>
+
+                    <Pressable
+                        onPress={openAccountPortal}
+                        className="p-4 rounded-xl bg-zinc-800 active:opacity-80"
+                    >
+                        <View className="flex-row justify-between items-center">
+                            <Text className="font-sans-medium text-white">
+                                Security
+                            </Text>
+                            <Ionicons
+                                name="chevron-forward"
+                                size={20}
+                                color="#a1a1aa"
+                            />
+                        </View>
+                        <Text className="text-sm text-zinc-400 mt-1">
+                            Password, 2FA, and connected accounts
+                        </Text>
+                    </Pressable>
+
+                    <Pressable
+                        onPress={() =>
+                            Alert.alert(
+                                'Coming soon',
+                                'Notifications settings will be available in a future update.',
+                                [{ text: 'OK' }]
+                            )
+                        }
+                        className="p-4 rounded-xl bg-zinc-800 active:opacity-80"
+                    >
+                        <View className="flex-row justify-between items-center">
+                            <Text className="font-sans-medium text-white">
+                                Notifications
+                            </Text>
+                            <Ionicons
+                                name="chevron-forward"
+                                size={20}
+                                color="#a1a1aa"
+                            />
+                        </View>
+                        <Text className="text-sm text-zinc-400 mt-1">
+                            Push and device alerts
+                        </Text>
+                    </Pressable>
+
+                    <Pressable
+                        onPress={onSignOut}
+                        className="mt-6 p-4 rounded-xl bg-cancel active:opacity-90"
+                    >
+                        <Text className="font-sans-medium text-white text-center">
+                            Sign Out
+                        </Text>
+                    </Pressable>
+                </View>
+            </View>
         </View>
-      </View>
-    </View>
-  );
+    );
 }
