@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { View, TextInput, Pressable } from 'react-native';
+import { View, TextInput, Pressable, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Link, useRouter } from 'expo-router';
 import { useSignIn } from '@clerk/clerk-expo';
@@ -15,7 +15,7 @@ import { GoogleSignInButton } from '../../components/GoogleSignInButton';
  */
 export default function SignInScreen() {
     const { signIn, setActive, isLoaded } = useSignIn();
-    const { hasCredentials, authenticate, setCredentials } =
+    const { hasCredentials, authenticate, setCredentials, biometricType } =
         useLocalCredentials();
     const router = useRouter();
     const [emailAddress, setEmailAddress] = useState('');
@@ -26,7 +26,7 @@ export default function SignInScreen() {
     const [error, setError] = useState<string | null>(null);
 
     const onBiometricPress = useCallback(async () => {
-        if (!isLoaded || !authenticate) return;
+        if (!isLoaded || !authenticate || !signIn) return;
         setError(null);
         try {
             const signInAttempt = await authenticate();
@@ -38,6 +38,23 @@ export default function SignInScreen() {
                         router.replace('/(drawer)');
                     },
                 });
+            } else if (signInAttempt?.status === 'needs_second_factor') {
+                const emailCodeFactor =
+                    signInAttempt.supportedSecondFactors?.find(
+                        (factor): factor is EmailCodeFactor =>
+                            factor.strategy === 'email_code',
+                    );
+                if (emailCodeFactor) {
+                    await signIn.prepareSecondFactor({
+                        strategy: 'email_code',
+                        emailAddressId: emailCodeFactor.emailAddressId,
+                    });
+                    setShowEmailCode(true);
+                } else {
+                    setError('2FA verification method not supported.');
+                }
+            } else {
+                setError('Biometric sign-in incomplete. Please try again.');
             }
         } catch (err) {
             const msg =
@@ -47,7 +64,7 @@ export default function SignInScreen() {
                     : 'Biometric sign-in failed';
             setError(msg);
         }
-    }, [isLoaded, authenticate, setActive, router]);
+    }, [isLoaded, authenticate, signIn, setActive, router]);
 
     const onSignInPress = useCallback(async () => {
         if (!isLoaded || !signIn) return;
@@ -239,13 +256,19 @@ export default function SignInScreen() {
                         </Text>
                     </Pressable>
                 </Link>
-                {hasCredentials ? (
+                {hasCredentials && biometricType ? (
                     <Pressable
                         onPress={onBiometricPress}
                         className="py-3 rounded-lg bg-zinc-800 border border-primary/30 active:opacity-90"
                     >
                         <Text className="text-center font-sans-medium text-white">
-                            Sign in with Face ID
+                            {biometricType === 'face-recognition'
+                                ? 'Sign in with Face ID'
+                                : biometricType === 'fingerprint'
+                                  ? Platform.OS === 'ios'
+                                    ? 'Sign in with Touch ID'
+                                    : 'Sign in with fingerprint'
+                                  : 'Sign in with biometrics'}
                         </Text>
                     </Pressable>
                 ) : null}

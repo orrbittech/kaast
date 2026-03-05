@@ -3,6 +3,7 @@ import { Drawer } from 'expo-router/drawer';
 import { useAuth } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
 import { CustomDrawerContent } from '../../components/CustomDrawerContent';
+import { DetailHeaderLeft } from '../../components/DetailHeaderLeft';
 import { HeaderAvatar } from '../../components/HeaderAvatar';
 
 /**
@@ -23,6 +24,7 @@ export default function DrawerLayout() {
                 drawerType: 'front',
                 headerShown: true,
                 headerTitle: () => null,
+                headerLeft: () => <DetailHeaderLeft />,
                 headerRight: () => <HeaderAvatar />,
                 swipeEnabled: true,
                 headerTransparent: true,

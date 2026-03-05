@@ -30,7 +30,30 @@ export interface Device {
     deviceId: string;
     name: string;
     status: string;
+    locationId?: string;
+    activePlaylistId?: string | null;
+    clerkUserId?: string | null;
     lastSeenAt?: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+/** Device with media session from GET /devices/:id */
+export interface DeviceWithMediaSession extends Device {
+    mediaSession?: {
+        mediaUrl?: string | null;
+        position: number;
+        duration: number;
+        playing: boolean;
+        volume?: number | null;
+    } | null;
+    activePlaylist?: { id: string; name: string } | null;
+}
+
+/** Response from POST /devices/pair */
+export interface PairDeviceResponse {
+    paired: boolean;
+    device: Device;
 }
 
 /** Media session from GET /media/sessions/:deviceId */
@@ -49,12 +72,10 @@ export interface CreateDevice {
     deviceId: string;
 }
 
-/** Pair device request body */
+/** Pair device request body. Code-only; deviceId resolved from cache. Org from token. */
 export interface PairDevice {
     code: string;
-    deviceId: string;
-    clerkOrgId: string;
-    locationId: string;
+    locationId?: string;
 }
 
 /** Response from POST /devices/pairing-code */
@@ -65,8 +86,56 @@ export interface GeneratePairingCodeResponse {
 /** Media command request body */
 export interface MediaCommand {
     deviceId: string;
-    command: 'play' | 'pause' | 'seek' | 'volume';
-    payload?: Record<string, unknown>;
+    command: 'play' | 'pause' | 'seek' | 'volume' | 'playPlaylist';
+    payload?: { playlistId?: string } & Record<string, unknown>;
+}
+
+/** Playlist from playlists API */
+export interface Playlist {
+    id: string;
+    name: string;
+    locationId: string;
+    createdAt?: string;
+    updatedAt?: string;
+    items?: PlaylistItem[];
+}
+
+/** Playlist item from playlists API */
+export interface PlaylistItem {
+    id: string;
+    playlistId: string;
+    mediaUrl: string;
+    title?: string | null;
+    duration?: number | null;
+    order: number;
+    createdAt?: string;
+}
+
+/** Create playlist request body */
+export interface CreatePlaylist {
+    name: string;
+    locationId: string;
+}
+
+/** Update playlist request body */
+export interface UpdatePlaylist {
+    name?: string;
+}
+
+/** Create playlist item request body */
+export interface CreatePlaylistItem {
+    mediaUrl: string;
+    title?: string | null;
+    duration?: number | null;
+    order?: number;
+}
+
+/** Update playlist item request body */
+export interface UpdatePlaylistItem {
+    mediaUrl?: string;
+    title?: string | null;
+    duration?: number | null;
+    order?: number;
 }
 
 /** Create location request body */

@@ -42,14 +42,27 @@
         }
       ],
       "expo-font",
-      "expo-secure-store",
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": "Use Face ID to sign in quickly"
+        }
+      ],
       [
         "expo-local-authentication",
         {
           "faceIDPermission": "Use Face ID to sign in quickly"
         }
       ],
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#ef4444",
+          "sounds": []
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

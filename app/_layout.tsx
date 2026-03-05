@@ -1,9 +1,13 @@
 import { useEffect } from 'react';
-import { Appearance, Platform } from 'react-native';
+import { Appearance, AppState, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { Stack } from 'expo-router';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+    QueryClient,
+    QueryClientProvider,
+    focusManager,
+} from '@tanstack/react-query';
 import { ClerkProvider } from '@clerk/clerk-expo';
 import { tokenCache } from '@clerk/clerk-expo/token-cache';
 import { useFonts } from '@expo-google-fonts/urbanist/useFonts';
@@ -12,13 +16,37 @@ import {
     Urbanist_500Medium,
     Urbanist_600SemiBold,
 } from '@expo-google-fonts/urbanist';
+import { IndieFlower_400Regular } from '@expo-google-fonts/indie-flower';
 import '../lib/theme/global.css';
+import { NetworkErrorHandler } from '../components/NetworkErrorHandler';
+import { requestNotificationPermissions } from '../lib/notifications/successNotification';
+
+/** Suppress Clerk development keys warning in dev console */
+if (__DEV__) {
+    const originalWarn = console.warn;
+    console.warn = (...args: unknown[]) => {
+        const msg = typeof args[0] === 'string' ? args[0] : '';
+        if (msg.startsWith('Clerk: Clerk has been loaded with development keys')) return;
+        originalWarn.apply(console, args);
+    };
+}
 
 SplashScreen.preventAutoHideAsync();
 
 export { ErrorBoundary } from '../components/ErrorBoundary';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 60_000,
+            gcTime: 5 * 60 * 1000,
+            refetchOnWindowFocus: true,
+            refetchOnReconnect: true,
+            retry: 2,
+            retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+        },
+    },
+});
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 if (!publishableKey) {
@@ -37,10 +65,18 @@ export default function RootLayout() {
         Urbanist_400Regular,
         Urbanist_500Medium,
         Urbanist_600SemiBold,
+        IndieFlower_400Regular,
     });
 
     useEffect(() => {
         Appearance.setColorScheme('dark');
+    }, []);
+
+    useEffect(() => {
+        const subscription = AppState.addEventListener('change', (status) => {
+            focusManager.setFocused(status === 'active');
+        });
+        return () => subscription.remove();
     }, []);
 
     useEffect(() => {
@@ -49,12 +85,17 @@ export default function RootLayout() {
         }
     }, [fontsLoaded]);
 
+    useEffect(() => {
+        requestNotificationPermissions();
+    }, []);
+
     if (!fontsLoaded) {
         return null;
     }
 
     return (
         <QueryClientProvider client={queryClient}>
+            <NetworkErrorHandler />
             <ClerkProvider
                 publishableKey={publishableKey}
                 tokenCache={tokenCache}

@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { Ionicons } from '@expo/vector-icons';
 import { useClerk } from '@clerk/clerk-expo';
+import { useLocalCredentials } from '@clerk/clerk-expo/local-credentials';
 import { Text } from '../../components/ui/Text';
 import { DRAWER_HEADER_HEIGHT } from '../../lib/constants';
 
@@ -17,7 +18,17 @@ export default function SettingsScreen() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
     const { signOut } = useClerk();
+    const { userOwnsCredentials, clearCredentials } = useLocalCredentials();
     const contentTopPadding = insets.top + DRAWER_HEADER_HEIGHT + 24;
+
+    const onRemoveBiometricCredentials = async () => {
+        try {
+            await clearCredentials?.();
+            Alert.alert('Done', 'Biometric credentials have been removed.');
+        } catch {
+            Alert.alert('Error', 'Failed to remove biometric credentials.');
+        }
+    };
 
     const openAccountPortal = async () => {
         if (accountPortalUrl) {
@@ -112,6 +123,22 @@ export default function SettingsScreen() {
                             Push and device alerts
                         </Text>
                     </Pressable>
+
+                    {userOwnsCredentials ? (
+                        <Pressable
+                            onPress={onRemoveBiometricCredentials}
+                            className="p-4 rounded-xl bg-zinc-800 active:opacity-80"
+                        >
+                            <View className="flex-row justify-between items-center">
+                                <Text className="font-sans-medium text-white">
+                                    Remove biometric credentials
+                                </Text>
+                            </View>
+                            <Text className="text-sm text-zinc-400 mt-1">
+                                Disable Face ID or fingerprint sign-in
+                            </Text>
+                        </Pressable>
+                    ) : null}
 
                     <Pressable
                         onPress={onSignOut}

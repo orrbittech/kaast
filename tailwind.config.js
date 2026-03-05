@@ -23,6 +23,7 @@ module.exports = {
         sans: ["Urbanist_400Regular"],
         "sans-medium": ["Urbanist_500Medium"],
         "sans-semibold": ["Urbanist_600SemiBold"],
+        "indie-flower": ["IndieFlower_400Regular"],
       },
     },
   },
