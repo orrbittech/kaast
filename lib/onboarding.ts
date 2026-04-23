@@ -1,6 +1,7 @@
 import * as SecureStore from "expo-secure-store";
 
-export const ONBOARDING_KEY = "kaast_has_completed_onboarding";
+export const ONBOARDING_KEY = "karr_has_completed_onboarding";
+const LEGACY_ONBOARDING_KEY = "kaast_has_completed_onboarding";
 
 export interface OnboardingSlide {
   title: string;
@@ -8,48 +9,46 @@ export interface OnboardingSlide {
   icon: string;
 }
 
-/**
- * Onboarding slides - sales-focused copy for KaasT intro and features.
- */
 export const SLIDES: OnboardingSlide[] = [
   {
-    title: "KaasT",
+    title: "KARR",
     subtitle:
-      "Your command center for brand-wide media. One app to rule every screen.",
-    icon: "📺",
+      "Welcome to your drive-through car wash command center.",
+    icon: "🚗",
   },
   {
-    title: "Media at Your Fingertips",
+    title: "Fast Drive-In Intake",
     subtitle:
-      "Manage every screen across your organization from one powerful app. No more juggling devices.",
-    icon: "📱",
+      "Scan license discs, prefill vehicle details, and start walk-ins in seconds.",
+    icon: "📷",
   },
   {
-    title: "Control Rogue Media",
+    title: "Secure Key Handover",
     subtitle:
-      "Eliminate unauthorized content. Schedule and plan with precision. Your brand, your rules.",
-    icon: "🎯",
+      "Release controls protect keys with claim code, PIN verification, and audit logs.",
+    icon: "🔐",
   },
   {
-    title: "Uniform Brand Experience",
+    title: "Service Flow Built-In",
     subtitle:
-      "Deliver consistent media and music across every store location. One voice, everywhere.",
-    icon: "🎵",
+      "Track every job from keys collected to wash complete and pickup ready.",
+    icon: "🧽",
   },
   {
-    title: "Get Started",
+    title: "Ready to Wash",
     subtitle:
-      "Get Star Fire. Sign in and take control of your media empire today.",
-    icon: "🚀",
+      "Sign in and start serving customers at your bay.",
+    icon: "✅",
   },
 ];
 
-/**
- * Check if user has completed onboarding.
- * Uses SecureStore (native only); on web returns false.
- */
 export async function hasCompletedOnboarding(): Promise<boolean> {
   try {
+    const legacy = await SecureStore.getItemAsync(LEGACY_ONBOARDING_KEY);
+    if (legacy === "true") {
+      await SecureStore.setItemAsync(ONBOARDING_KEY, "true");
+      await SecureStore.deleteItemAsync(LEGACY_ONBOARDING_KEY);
+    }
     const value = await SecureStore.getItemAsync(ONBOARDING_KEY);
     return value === "true";
   } catch {
@@ -57,10 +56,6 @@ export async function hasCompletedOnboarding(): Promise<boolean> {
   }
 }
 
-/**
- * Mark onboarding as complete.
- * Uses SecureStore (native only); on web no-op.
- */
 export async function setOnboardingComplete(): Promise<void> {
   try {
     await SecureStore.setItemAsync(ONBOARDING_KEY, "true");

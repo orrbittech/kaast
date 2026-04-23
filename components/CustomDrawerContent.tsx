@@ -30,8 +30,8 @@ export function CustomDrawerContent(props: DrawerContentComponentProps) {
       >
         <View className="flex-row items-center justify-between px-4 py-6">
           <View>
-            <Text className="text-xl font-sans-semibold text-white">Kaast</Text>
-            <Text className="text-sm text-zinc-400 mt-1">Media Control</Text>
+            <Text className="text-xl font-sans-semibold text-white">KARR</Text>
+            <Text className="text-sm text-zinc-400 mt-1">Drive-through POS</Text>
           </View>
           <Pressable
             onPress={() => props.navigation.closeDrawer()}

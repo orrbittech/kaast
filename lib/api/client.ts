@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 import { getClerkInstance } from "@clerk/clerk-expo";
 
 const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000";
+  process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001/api/v1";
 
 /**
  * API client with Clerk token injection and error handling.

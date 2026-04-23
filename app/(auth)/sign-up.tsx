@@ -117,7 +117,7 @@ export default function SignUpScreen() {
           Create account
         </Text>
         <Text className="text-zinc-400">
-          Sign up to get started with Kaast media control
+          Sign up to get started with KARR drive-through POS
         </Text>
         {error ? (
           <Text className="text-sm text-cancel">{error}</Text>

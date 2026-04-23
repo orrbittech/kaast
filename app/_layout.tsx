@@ -6,6 +6,7 @@ import { Stack } from "expo-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ClerkProvider } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
+import { StripeProvider } from "@stripe/stripe-react-native";
 import { useFonts } from "@expo-google-fonts/urbanist/useFonts";
 import {
   Urbanist_400Regular,
@@ -14,7 +15,9 @@ import {
 } from "@expo-google-fonts/urbanist";
 import "../lib/theme/global.css";
 
-SplashScreen.preventAutoHideAsync();
+void SplashScreen.preventAutoHideAsync().catch(() => {
+  // Dev reload / second call: native splash may not be registered for this view controller.
+});
 
 export { ErrorBoundary } from "../components/ErrorBoundary";
 
@@ -26,6 +29,7 @@ if (!publishableKey) {
     "Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY. Add it to your .env file."
   );
 }
+const stripePublishableKey = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "";
 
 /**
  * Root layout - wraps auth and drawer groups.
@@ -45,7 +49,9 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (fontsLoaded) {
-      SplashScreen.hideAsync();
+      void SplashScreen.hideAsync().catch(() => {
+        // Fast Refresh can leave no native splash for this lifecycle; ignore.
+      });
     }
   }, [fontsLoaded]);
 
@@ -56,21 +62,23 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-        <StatusBar
-          style="light"
-          translucent={Platform.OS === "android"}
-          backgroundColor={Platform.OS === "android" ? "transparent" : undefined}
-        />
-        <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-      </Stack>
+        <StripeProvider publishableKey={stripePublishableKey} merchantIdentifier="merchant.karr.pos">
+          <StatusBar
+            style="light"
+            translucent={Platform.OS === "android"}
+            backgroundColor={Platform.OS === "android" ? "transparent" : undefined}
+          />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+          </Stack>
+        </StripeProvider>
       </ClerkProvider>
     </QueryClientProvider>
   );

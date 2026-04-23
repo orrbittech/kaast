@@ -9,7 +9,11 @@
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Scan vehicle disc codes for drive-in wash intake.",
+        "NSUserNotificationsUsageDescription": "Show a quick confirmation when a walk-in booking is created."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -19,6 +23,10 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
+      "permissions": [
+        "CAMERA",
+        "POST_NOTIFICATIONS"
+      ],
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -27,6 +35,12 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-notifications",
+        {
+          "enableBackgroundRemoteNotifications": false
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -41,13 +55,21 @@
       ],
       "expo-font",
       "expo-secure-store",
+      "expo-camera",
       [
         "expo-local-authentication",
         {
           "faceIDPermission": "Use Face ID to sign in quickly"
         }
       ],
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.karr.pos",
+          "enableGooglePay": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

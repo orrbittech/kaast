@@ -181,7 +181,7 @@ export default function SignInScreen() {
           Welcome back
         </Text>
         <Text className="text-zinc-400">
-          Sign in to control your media devices
+          Sign in to run the KARR drive-through POS
         </Text>
         {error ? (
           <Text className="text-sm text-cancel">{error}</Text>

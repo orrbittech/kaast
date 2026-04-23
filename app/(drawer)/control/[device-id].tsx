@@ -10,7 +10,8 @@ import { DRAWER_HEADER_HEIGHT } from "../../../lib/constants";
  */
 export default function ControlScreen() {
   const insets = useSafeAreaInsets();
-  const { deviceId } = useLocalSearchParams<{ deviceId: string }>();
+  const params = useLocalSearchParams<{ "device-id"?: string }>();
+  const deviceId = params["device-id"];
   const contentTopPadding = insets.top + DRAWER_HEADER_HEIGHT + 24;
 
   return (

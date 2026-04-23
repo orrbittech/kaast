@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { useClerk } from "@clerk/clerk-expo";
 import { Text } from "../../components/ui/Text";
 import { DRAWER_HEADER_HEIGHT } from "../../lib/constants";
+import { expoReceiptPrinter } from "../../lib/printing/ExpoReceiptPrinter";
 
 /**
  * Settings screen - app preferences and sign out.
@@ -27,21 +28,32 @@ export default function SettingsScreen() {
       <View className="flex-1 justify-center max-w-md">
         <Text className="text-2xl font-sans-semibold text-white mb-2">Settings</Text>
         <Text className="text-zinc-400 mb-6">
-          Manage your account and preferences
+          Manage your account and POS preferences
         </Text>
 
         <View className="gap-4">
         <Pressable className="p-4 rounded-xl bg-zinc-800 active:opacity-80">
-          <Text className="font-sans-medium text-white">Account</Text>
+          <Text className="font-sans-medium text-white">API Endpoint</Text>
           <Text className="text-sm text-zinc-400 mt-1">
-            Profile and organization
+            {process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3001/api/v1"}
           </Text>
         </Pressable>
 
-        <Pressable className="p-4 rounded-xl bg-zinc-800 active:opacity-80">
-          <Text className="font-sans-medium text-white">Notifications</Text>
+        <Pressable
+          onPress={() =>
+            expoReceiptPrinter.print({
+              bookingCode: "TEST-PRINT",
+              plate: "TEST123GP",
+              washPackageName: "Receipt printer check",
+              amountPaidCents: 0,
+              outstandingCents: 0,
+            })
+          }
+          className="p-4 rounded-xl bg-zinc-800 active:opacity-80"
+        >
+          <Text className="font-sans-medium text-white">Printer test</Text>
           <Text className="text-sm text-zinc-400 mt-1">
-            Push and device alerts
+            Print a sample receipt to validate Sunmi setup
           </Text>
         </Pressable>
 

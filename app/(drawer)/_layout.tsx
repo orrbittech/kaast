@@ -50,25 +50,41 @@ export default function DrawerLayout() {
       <Drawer.Screen
         name="devices"
         options={{
-          drawerLabel: "Devices",
+          drawerLabel: "Vehicles",
           drawerIcon: ({ color, size }) => (
-            <Ionicons name="phone-portrait-outline" size={size} color={color} />
+            <Ionicons name="car-outline" size={size} color={color} />
           ),
         }}
       />
       <Drawer.Screen
-        name="media"
+        name="scan"
         options={{
-          drawerLabel: "Media",
+          drawerLabel: "Scan",
           drawerIcon: ({ color, size }) => (
-            <Ionicons name="play-circle-outline" size={size} color={color} />
+            <Ionicons name="scan-outline" size={size} color={color} />
           ),
         }}
       />
       <Drawer.Screen
-        name="playlists"
+        name="walk-in"
         options={{
-          drawerLabel: "Playlists",
+          drawerLabel: "Walk-In",
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="add-circle-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="walk-in-confirm-vehicle"
+        options={{
+          drawerLabel: "Confirm vehicle",
+          drawerItemStyle: { display: "none" },
+        }}
+      />
+      <Drawer.Screen
+        name="jobs/index"
+        options={{
+          drawerLabel: "Jobs",
           drawerIcon: ({ color, size }) => (
             <Ionicons name="list-outline" size={size} color={color} />
           ),
@@ -91,9 +107,37 @@ export default function DrawerLayout() {
         }}
       />
       <Drawer.Screen
-        name="control/[deviceId]"
+        name="media"
         options={{
-          drawerLabel: "Control",
+          drawerLabel: "Media",
+          drawerItemStyle: { display: "none" },
+        }}
+      />
+      <Drawer.Screen
+        name="playlists"
+        options={{
+          drawerLabel: "Playlists",
+          drawerItemStyle: { display: "none" },
+        }}
+      />
+      <Drawer.Screen
+        name="jobs/[booking-id]"
+        options={{
+          drawerLabel: "Job",
+          drawerItemStyle: { display: "none" },
+        }}
+      />
+      <Drawer.Screen
+        name="pay/[booking-id]"
+        options={{
+          drawerLabel: "Pay",
+          drawerItemStyle: { display: "none" },
+        }}
+      />
+      <Drawer.Screen
+        name="control/[device-id]"
+        options={{
+          drawerLabel: "Legacy",
           drawerItemStyle: { display: "none" },
         }}
       />
